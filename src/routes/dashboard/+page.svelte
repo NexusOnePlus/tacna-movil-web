@@ -178,7 +178,7 @@
 		{/if}
 	</section>
 
-	<section class="relative min-h-[320px] flex-1">
+	<section class="relative flex min-h-[320px] flex-1 flex-col">
 		<Map buses={visibleBuses} {selectedBusId} mapStyle={MAP_STYLE} />
 
 		<div

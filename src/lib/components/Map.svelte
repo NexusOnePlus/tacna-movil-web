@@ -151,7 +151,7 @@
 	});
 </script>
 
-<div class="relative h-full min-h-[320px] w-full">
+<div class="relative min-h-[320px] w-full flex-1">
 	<div bind:this={container} class="absolute inset-0"></div>
 
 	{#if mapError}

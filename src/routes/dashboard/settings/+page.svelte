@@ -159,16 +159,16 @@
 		<section class="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4">
 			<h2 class="text-sm font-semibold text-white">Checklist de despliegue</h2>
 			<ul class="mt-3 space-y-1.5 text-[11px] text-neutral-400">
-				<li>· Schema + RLS + seed ejecutados en Supabase (secciones 1, 2 y 7.5).</li>
+				<li>· Schema, RLS, grants y seed ejecutados en Supabase.</li>
 				<li>
 					· <code>VITE_SUPABASE_URL</code>, <code>VITE_SUPABASE_ANON_KEY</code>,
-					<code>VITE_MAP_STYLE</code>, <code>VITE_APP_ENV</code> en Cloudflare Pages.
+					<code>VITE_MAP_STYLE</code> y <code>VITE_APP_ENV</code> como variables de build del Worker.
 				</li>
-				<li>· <code>VITE_PANEL_BASE_DOMAIN=glook.pro</code> para el routing por subdominio.</li>
 				<li>
-					· Custom domains: <code>tacna-movil.glook.pro</code> y <code>tacna-panel.glook.pro</code>.
+					· Custom domains: <code>tacna-movil.glook.pro</code> y <code>tacna-panel.glook.pro</code>
+					apuntando al mismo Worker.
 				</li>
-				<li>· CNAME en Hostinger apuntando a <code>tacna-movil-web.pages.dev</code>.</li>
+				<li>· Zona <code>glook.pro</code> activa en Cloudflare.</li>
 				<li>· Realtime solo si usas <code>postgres_changes</code> (el GPS va por Broadcast).</li>
 			</ul>
 		</section>

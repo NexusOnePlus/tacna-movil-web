@@ -81,6 +81,39 @@ bun run preview    # sirve el build con wrangler
 bun run storybook  # catálogo de componentes
 ```
 
+## Despliegue en Cloudflare
+
+El mismo Worker sirve los dos hostnames; `src/hooks.server.ts` decide si la
+request es landing o panel según el host.
+
+1. La zona `glook.pro` debe estar activa en Cloudflare.
+2. Configura `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_MAP_STYLE` y
+   `VITE_APP_ENV` como **variables de build** del Worker. Al ser `VITE_*` se
+   incrustan al compilar, así que deben existir antes del `build`.
+3. Despliega:
+
+   ```sh
+   bunx wrangler login
+   bun run build
+   bunx wrangler deploy
+   ```
+
+4. En **Workers → tacna-movil-web → Settings → Domains & Routes** agrega los dos
+   custom domains:
+   - `tacna-movil.glook.pro`
+   - `tacna-panel.glook.pro`
+5. En **Supabase → Authentication → URL Configuration**:
+   - Site URL: `https://tacna-panel.glook.pro`
+   - Redirect URLs: `https://tacna-panel.glook.pro/**`,
+     `https://tacna-movil.glook.pro/**` y `http://localhost:5173/**`
+6. Comprueba:
+   - `https://tacna-movil.glook.pro` → landing
+   - `https://tacna-panel.glook.pro` → login
+   - `https://tacna-movil.glook.pro/login` → redirige al panel
+
+El preview `https://tacna-movil-web.<cuenta>.workers.dev` no tiene subdominios:
+entra directo a `/login` o usa `/dashboard?panel`.
+
 ## Cómo se mueven los datos
 
 - **Mapa**: MapLibre GL con el estilo de `VITE_MAP_STYLE`.

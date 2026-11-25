@@ -33,6 +33,7 @@ function isLocalHost(hostname: string): boolean {
 		hostname === '[::1]' ||
 		hostname.endsWith('.local') ||
 		hostname.endsWith('.pages.dev') ||
+		hostname.endsWith('.workers.dev') ||
 		/^(10|192\.168)\./.test(hostname)
 	);
 }

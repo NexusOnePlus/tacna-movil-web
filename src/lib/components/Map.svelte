@@ -66,19 +66,23 @@
 			'bottom-right'
 		);
 
-		let ready = false;
 		instance.on('load', () => {
-			ready = true;
 			mapError = null;
 		});
 		instance.on('error', (event) => {
-			if (ready) return;
-			mapError = event.error?.message || 'No se pudo cargar el estilo del mapa.';
+			mapError ??= event.error?.message || 'No se pudo cargar un recurso del mapa.';
 		});
+
+		// El contenedor cambia de tamaño al montar (flex) y con la ventana.
+		// Sin resize() MapLibre se queda con el tamaño inicial y dibuja en una franja.
+		const observer = new ResizeObserver(() => instance.resize());
+		observer.observe(container);
+		requestAnimationFrame(() => instance.resize());
 
 		map = instance;
 
 		return () => {
+			observer.disconnect();
 			for (const view of markers.values()) {
 				unmount(view.icon);
 				view.marker.remove();

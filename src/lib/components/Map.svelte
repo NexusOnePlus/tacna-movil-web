@@ -159,8 +159,8 @@
 	});
 </script>
 
-<div class="relative min-h-[320px] w-full flex-1">
-	<div bind:this={container} class="absolute inset-0"></div>
+<div class="relative flex min-h-[320px] w-full flex-1 flex-col">
+	<div bind:this={container} class="min-h-0 w-full flex-1"></div>
 
 	{#if mapError}
 		<p

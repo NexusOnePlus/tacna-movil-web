@@ -1,0 +1,9 @@
+{
+	"$schema": "https://opencode.ai/config.json",
+	"references": {
+		"context": {
+			"path": "../tacna-movil-context",
+			"description": "Estado vivo, arquitectura, decisiones y guías de Tacna Móvil"
+		}
+	}
+}

@@ -7,7 +7,8 @@
 		Map as MapLibreMap,
 		Marker,
 		NavigationControl,
-		ScaleControl
+		ScaleControl,
+		setWorkerUrl
 	} from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import { SvelteMap } from 'svelte/reactivity';
@@ -50,6 +51,9 @@
 	}
 
 	onMount(() => {
+		// Vite no emite el worker dinámico de MapLibre; se copia a static/ como .js.
+		setWorkerUrl('/maplibre-gl-worker.js');
+
 		const instance = new MapLibreMap({
 			container,
 			style: mapStyle,

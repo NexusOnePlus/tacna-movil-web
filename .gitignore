@@ -22,6 +22,9 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Generado por scripts/sync-maplibre-worker.mjs
+/static/maplibre-gl-worker.js
+
 # Generado por wrangler types
 worker-configuration.d.ts
 

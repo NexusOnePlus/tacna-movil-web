@@ -33,6 +33,11 @@ on conflict (id) do update set role = excluded.role;
 lectura. La autorización real la aplica RLS en Postgres: la UI solo oculta
 botones. Sin fila en `profiles` el usuario inicia sesión pero queda sin permisos.
 
+Si el panel dice **«Perfil sin rol»** o **«bloqueó la operación por RLS»**, ejecuta
+completo `supabase/policies.sql` en el SQL Editor y pulsa **Ajustes → Recargar
+perfil**. `supabase/diagnostico.sql` sirve para ver el estado de usuario, tablas y
+políticas antes y después.
+
 En producción, pedir `/login` o `/dashboard` desde el dominio de la landing
 redirige al subdominio del panel. En local y en previews (`*.pages.dev`) no hay
 redirecciones entre hosts.
@@ -68,7 +73,7 @@ domains `tacna-movil.glook.pro` y `tacna-panel.glook.pro`.
 ```sh
 bun install
 bun run dev        # servidor de desarrollo
-bun run check      # wrangler types + svelte-check
+bun run check      # svelte-check
 bun run lint       # prettier --check + eslint
 bun run format     # prettier --write
 bun run build      # build para Cloudflare

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { mount, unmount } from 'svelte';
+	import BusIcon from '@lucide/svelte/icons/bus';
 	import {
 		AttributionControl,
 		Map as MapLibreMap,
@@ -30,9 +32,12 @@
 
 	let container: HTMLDivElement;
 	let map = $state<MapLibreMap | null>(null);
+	let mapError = $state<string | null>(null);
 	let followedId: string | null = null;
 
-	const markers = new SvelteMap<string, Marker>();
+	type MarkerView = { marker: Marker; icon: ReturnType<typeof mount> };
+
+	const markers = new SvelteMap<string, MarkerView>();
 
 	function markerClass(selected: boolean): string {
 		return [
@@ -61,10 +66,23 @@
 			'bottom-right'
 		);
 
+		let ready = false;
+		instance.on('load', () => {
+			ready = true;
+			mapError = null;
+		});
+		instance.on('error', (event) => {
+			if (ready) return;
+			mapError = event.error?.message || 'No se pudo cargar el estilo del mapa.';
+		});
+
 		map = instance;
 
 		return () => {
-			for (const marker of markers.values()) marker.remove();
+			for (const view of markers.values()) {
+				unmount(view.icon);
+				view.marker.remove();
+			}
 			markers.clear();
 			instance.remove();
 			map = null;
@@ -78,31 +96,33 @@
 
 		const activeIds = new Set(buses.map((bus) => bus.bus_id));
 
-		for (const [busId, marker] of markers) {
+		for (const [busId, view] of markers) {
 			if (!activeIds.has(busId)) {
-				marker.remove();
+				unmount(view.icon);
+				view.marker.remove();
 				markers.delete(busId);
 			}
 		}
 
 		for (const bus of buses) {
 			const selected = bus.bus_id === selectedBusId;
-			let marker = markers.get(bus.bus_id);
+			let view = markers.get(bus.bus_id);
 
-			if (!marker) {
+			if (!view) {
 				const element = document.createElement('div');
-				marker = new Marker({ element, anchor: 'center' })
+				const marker = new Marker({ element, anchor: 'center' })
 					.setLngLat([bus.lng, bus.lat])
 					.addTo(instance);
-				markers.set(bus.bus_id, marker);
+				const icon = mount(BusIcon, { target: element, props: { size: 18, strokeWidth: 2.5 } });
+				view = { marker, icon };
+				markers.set(bus.bus_id, view);
 			}
 
-			const element = marker.getElement();
+			const element = view.marker.getElement();
 			element.className = markerClass(selected);
-			element.textContent = '🚌';
 			element.title = `${bus.plate} · ${Math.round(bus.speed)} km/h`;
 
-			marker.setLngLat([bus.lng, bus.lat]);
+			view.marker.setLngLat([bus.lng, bus.lat]);
 		}
 	});
 
@@ -131,4 +151,14 @@
 	});
 </script>
 
-<div bind:this={container} class="h-full w-full"></div>
+<div class="relative h-full min-h-[320px] w-full">
+	<div bind:this={container} class="absolute inset-0"></div>
+
+	{#if mapError}
+		<p
+			class="pointer-events-none absolute inset-x-3 top-3 rounded-lg border border-red-500/40 bg-neutral-950/95 px-3 py-2 text-[11px] text-red-300"
+		>
+			Mapa: {mapError}
+		</p>
+	{/if}
+</div>

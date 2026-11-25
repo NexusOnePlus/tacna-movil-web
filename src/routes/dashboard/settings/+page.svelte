@@ -9,6 +9,14 @@
 
 	const appEnv = (import.meta.env.VITE_APP_ENV as string | undefined) ?? 'development';
 
+	let refreshing = $state(false);
+
+	async function refreshProfile() {
+		refreshing = true;
+		await session.loadProfile();
+		refreshing = false;
+	}
+
 	const supabaseHost = $derived.by(() => {
 		const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 		if (!url) return '—';
@@ -103,15 +111,32 @@
 				>
 					No se pudo leer <code>profiles</code>: {session.profileError}
 				</p>
+			{:else if session.session && !session.profile}
+				<p
+					class="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-200"
+				>
+					No hay fila en <code>profiles</code> para este usuario. Créala en Supabase con
+					<code>role = 'admin'</code> y pulsa «Recargar perfil».
+				</p>
 			{/if}
 
-			<button
-				type="button"
-				onclick={handleSignOut}
-				class="mt-4 rounded-lg border border-neutral-800 px-3 py-1.5 text-[11px] text-neutral-300 transition hover:border-red-500/40 hover:text-red-300"
-			>
-				Cerrar sesión
-			</button>
+			<div class="mt-4 flex flex-wrap gap-2">
+				<button
+					type="button"
+					onclick={refreshProfile}
+					disabled={refreshing}
+					class="rounded-lg border border-neutral-800 px-3 py-1.5 text-[11px] text-neutral-300 transition hover:border-amber-500/40 hover:text-amber-300 disabled:opacity-60"
+				>
+					{refreshing ? 'Recargando…' : 'Recargar perfil'}
+				</button>
+				<button
+					type="button"
+					onclick={handleSignOut}
+					class="rounded-lg border border-neutral-800 px-3 py-1.5 text-[11px] text-neutral-300 transition hover:border-red-500/40 hover:text-red-300"
+				>
+					Cerrar sesión
+				</button>
+			</div>
 		</section>
 
 		<section class="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4">

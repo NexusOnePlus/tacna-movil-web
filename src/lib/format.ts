@@ -24,10 +24,22 @@ export function formatSpeed(kmh: number): string {
 /** Traduce errores crudos de Postgres/PostgREST a algo accionable en la UI. */
 export function friendlyError(message: string): string {
 	if (/relation .* does not exist|no existe la relación/i.test(message)) {
-		return 'La tabla no existe en Supabase. Ejecuta el SQL del plan (secciones 1 y 2) en el SQL Editor antes de usar el panel.';
+		return 'La tabla no existe en Supabase. Ejecuta el esquema inicial en el SQL Editor antes de usar el panel.';
 	}
-	if (/row-level security|permission denied|violates row-level/i.test(message)) {
-		return 'RLS bloqueó la operación. Revisa que tu perfil tenga rol admin/dispatcher y que las políticas de la tabla estén aplicadas.';
+	if (/email not confirmed/i.test(message)) {
+		return 'El correo no está confirmado. Confírmalo en Supabase → Authentication → Users.';
+	}
+	if (/invalid login credentials/i.test(message)) {
+		return 'Correo o contraseña incorrectos.';
+	}
+	if (/permission denied for table/i.test(message)) {
+		const table = message.match(/permission denied for table ["']?([a-z0-9_]+)["']?/i)?.[1];
+		return `El rol de PostgREST no tiene permisos sobre ${table ?? 'la tabla'}. Ejecuta los GRANT de supabase/policies.sql.`;
+	}
+	if (/row-level security|violates row-level/i.test(message)) {
+		const table = message.match(/table ["']?([a-z0-9_]+)["']?/i)?.[1];
+		const target = table ? ` la tabla ${table}` : ' la operación';
+		return `Postgres bloqueó${target} por RLS: para escribir tu perfil debe ser admin/dispatcher; para leer falta la política SELECT.`;
 	}
 	if (/Invalid API key|apikey/i.test(message)) {
 		return 'Las credenciales de Supabase no son válidas. Revisa VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY.';

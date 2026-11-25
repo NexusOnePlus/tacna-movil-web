@@ -22,5 +22,8 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Generado por wrangler types
+worker-configuration.d.ts
+
 # capturas del agente de diseño
 .taste-skill/

@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
+	import BusIcon from '@lucide/svelte/icons/bus';
+	import MapIcon from '@lucide/svelte/icons/map';
+	import RouteIcon from '@lucide/svelte/icons/route';
+	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
@@ -11,10 +16,10 @@
 	let { children }: { children: Snippet } = $props();
 
 	const NAV = [
-		{ path: '/dashboard', label: 'Mapa en vivo', icon: '🗺️' },
-		{ path: '/dashboard/buses', label: 'Buses', icon: '🚌' },
-		{ path: '/dashboard/routes', label: 'Rutas', icon: '🛣️' },
-		{ path: '/dashboard/settings', label: 'Ajustes', icon: '⚙️' }
+		{ path: '/dashboard', label: 'Mapa en vivo', icon: MapIcon },
+		{ path: '/dashboard/buses', label: 'Buses', icon: BusIcon },
+		{ path: '/dashboard/routes', label: 'Rutas', icon: RouteIcon },
+		{ path: '/dashboard/settings', label: 'Ajustes', icon: SettingsIcon }
 	] as const;
 
 	onMount(() => {
@@ -103,6 +108,7 @@
 
 			<nav class="flex-1 space-y-1 p-3">
 				{#each NAV as item (item.path)}
+					{@const Icon = item.icon}
 					<a
 						href={resolve(item.path)}
 						aria-current={isActive(item.path) ? 'page' : undefined}
@@ -112,7 +118,7 @@
 							? 'bg-amber-500/15 font-semibold text-amber-400'
 							: 'text-neutral-400 hover:bg-neutral-800/60 hover:text-white'}"
 					>
-						<span aria-hidden="true">{item.icon}</span>
+						<Icon class="h-4 w-4 shrink-0" />
 						{item.label}
 					</a>
 				{/each}
@@ -162,7 +168,7 @@
 					</span>
 
 					{#if busTracker.lastError}
-						<span class="text-[11px] text-amber-400" title={busTracker.lastError}>⚠︎</span>
+						<TriangleAlert class="h-3.5 w-3.5 text-amber-400" title={busTracker.lastError} />
 					{/if}
 				</div>
 
@@ -179,13 +185,16 @@
 
 			<nav class="flex gap-1 overflow-x-auto border-b border-neutral-800 px-2 py-2 md:hidden">
 				{#each NAV as item (item.path)}
+					{@const Icon = item.icon}
 					<a
 						href={resolve(item.path)}
-						class="shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] transition {isActive(item.path)
+						class="flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] transition {isActive(
+							item.path
+						)
 							? 'bg-amber-500/15 font-semibold text-amber-400'
 							: 'text-neutral-400 hover:bg-neutral-800/60'}"
 					>
-						{item.icon}
+						<Icon class="h-3.5 w-3.5" />
 						{item.label}
 					</a>
 				{/each}

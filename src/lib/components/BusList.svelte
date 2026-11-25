@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import BusIcon from '@lucide/svelte/icons/bus';
 	import { formatAgo, formatSpeed } from '#lib/format';
 	import type { BusPosition } from '#lib/types';
 
@@ -44,7 +45,7 @@
 							? 'bg-amber-400 text-black'
 							: 'bg-neutral-800 text-amber-400'}"
 					>
-						🚌
+						<BusIcon size={16} strokeWidth={2.4} />
 					</span>
 
 					<span class="min-w-0 flex-1">

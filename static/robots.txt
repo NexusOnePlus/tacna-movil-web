@@ -1,3 +1,5 @@
-# allow crawling everything by default
+# Landing pública: indexable.
+# El panel de despacho vive en tacna-panel.glook.pro y no se indexa.
 User-agent: *
-Disallow:
+Disallow: /login
+Disallow: /dashboard

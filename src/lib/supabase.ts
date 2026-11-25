@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Variables públicas (prefijo VITE_ obligatorio para exponerlas al cliente).
-// Configúralas en .env local y en Cloudflare Pages > Settings > Environment variables.
+// Configúralas en .env local y como variables de build del Worker en Cloudflare.
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 

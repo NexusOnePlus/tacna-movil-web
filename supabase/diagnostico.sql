@@ -79,7 +79,7 @@ order by seccion, detalle;
 
 -- ============================================================
 -- BLOQUE 2: simula al usuario autenticado (prueba real de RLS)
--- Reemplaza el UUID por el de Authentication → Users.
+-- Reemplaza <uuid-del-usuario> por el de Authentication → Users.
 -- ============================================================
 select set_config(
 	'request.jwt.claims',

@@ -91,9 +91,16 @@ class BusTracker {
 		if (typeof payload.lat !== 'number' || typeof payload.lng !== 'number') return;
 		if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) return;
 
+		const previous = this.positions[payload.bus_id];
+		if (previous && payload.updated_at && payload.updated_at < previous.updated_at) return;
+
 		this.positions[payload.bus_id] = {
 			bus_id: payload.bus_id,
 			route_id: payload.route_id ?? '',
+			route_number:
+				typeof payload.route_number === 'string' && /^\d{1,6}$/.test(payload.route_number)
+					? payload.route_number
+					: undefined,
 			plate: payload.plate ?? payload.bus_id.slice(0, 8),
 			lat: payload.lat,
 			lng: payload.lng,

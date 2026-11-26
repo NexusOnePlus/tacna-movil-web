@@ -22,6 +22,12 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Local
+/data/
+/backups/
+*.dump
+/supabase/seed.local.sql
+
 # Generado por scripts/sync-maplibre-worker.mjs
 /static/maplibre-gl-worker.js
 

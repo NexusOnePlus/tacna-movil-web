@@ -3,13 +3,6 @@
 Landing pública y panel de despacho del transporte urbano de Tacna. SvelteKit +
 Supabase + MapLibre, desplegado en Cloudflare Workers.
 
-## Contexto compartido
-
-La memoria viva está fuera del repo: reference `context` → `../tacna-movil-context`.
-
-- Al empezar una sesión: lee `.context/STATUS.md` y `.context/CONSTRAINTS.md`.
-- Al terminar: actualízalos en ese repo y commitea allí, no aquí.
-
 ## Comandos
 
 ```sh
@@ -43,3 +36,14 @@ Usa Bun, no npm.
 - No versionar `worker-configuration.d.ts` (generado).
 - Commits convencionales en español.
 - Si hay que reescribir y empujar: `git push --force-with-lease`.
+
+## Memoria
+
+La memoria del proyecto vive en Basic Memory (MCP `memory-tacna-web`, proyecto
+`tacna-movil-web`). No hay repo de contexto externo.
+
+- Al empezar: `bm_read` o `bm_search` de `Estado actual` y `Restricciones del proyecto`.
+- Arquitectura y flujos: `Arquitectura` y `Cómo funciona el sistema`.
+- Reglas generales del sistema: MCP `basic-memory`, proyecto `global`.
+- Al cerrar: `bm_write` en `sesiones/`, `decisiones/` o `problemas/`.
+- Nunca secretos, tokens, datos de clientes ni rutas internas.

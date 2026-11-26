@@ -4,12 +4,14 @@
 	import Map from '#lib/components/Map.svelte';
 	import RouteSelector from '#lib/components/RouteSelector.svelte';
 	import { friendlyError } from '#lib/format';
+	import { loadRouteLines, type RouteLines } from '#lib/route-lines';
 	import { MAP_STYLE, supabase } from '#lib/supabase';
 	import { busTracker } from '#lib/stores/bus-tracker.svelte';
 	import { session } from '#lib/stores/session.svelte';
 	import type { BusPosition, BusRoute } from '#lib/types';
 
 	let routes = $state<BusRoute[]>([]);
+	let routeLines = $state<RouteLines | null>(null);
 	let routesError = $state<string | null>(null);
 	let routeFilter = $state<string | null>(null);
 	let selectedBusId = $state<string | null>(null);
@@ -26,14 +28,15 @@
 
 	onMount(() => {
 		void (async () => {
-			const { data, error } = await supabase
-				.from('routes')
-				.select('*')
-				.eq('is_active', true)
-				.order('short_code');
+			const [routesResult, lines] = await Promise.all([
+				supabase.from('routes').select('*').eq('is_active', true).order('short_code'),
+				loadRouteLines()
+			]);
 
-			if (error) routesError = friendlyError(error.message);
-			else routes = (data ?? []) as BusRoute[];
+			if (routesResult.error) routesError = friendlyError(routesResult.error.message);
+			else routes = (routesResult.data ?? []) as BusRoute[];
+
+			routeLines = lines;
 		})();
 
 		return () => stopSimulator();
@@ -181,7 +184,7 @@
 	</section>
 
 	<section class="relative flex min-h-[320px] flex-1 flex-col">
-		<Map buses={visibleBuses} {selectedBusId} mapStyle={MAP_STYLE} />
+		<Map buses={visibleBuses} {selectedBusId} mapStyle={MAP_STYLE} {routeLines} />
 
 		<div
 			class="pointer-events-none absolute bottom-3 left-3 rounded-sm border border-hairline bg-page/90 px-2.5 py-1.5 text-[10px] text-muted"

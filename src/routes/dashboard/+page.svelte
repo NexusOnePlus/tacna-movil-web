@@ -9,6 +9,7 @@
 	import HatchBar from '#lib/components/HatchBar.svelte';
 	import Map from '#lib/components/Map.svelte';
 	import { formatAgo } from '#lib/format';
+	import { loadRouteLines, type RouteLines } from '#lib/route-lines';
 	import { MAP_STYLE, supabase } from '#lib/supabase';
 	import { busTracker } from '#lib/stores/bus-tracker.svelte';
 	import type { Bus, BusRoute } from '#lib/types';
@@ -16,6 +17,7 @@
 	type BusRow = Pick<Bus, 'id' | 'plate' | 'route_id' | 'status' | 'capacity'>;
 
 	let routes = $state<BusRoute[]>([]);
+	let routeLines = $state<RouteLines | null>(null);
 	let buses = $state<BusRow[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
@@ -25,9 +27,10 @@
 		const clock = setInterval(() => (now = Date.now()), 1_000);
 
 		void (async () => {
-			const [routesResult, busesResult] = await Promise.all([
+			const [routesResult, busesResult, lines] = await Promise.all([
 				supabase.from('routes').select('*').eq('is_active', true).order('short_code'),
-				supabase.from('buses').select('id, plate, route_id, status, capacity').order('plate')
+				supabase.from('buses').select('id, plate, route_id, status, capacity').order('plate'),
+				loadRouteLines()
 			]);
 
 			if (routesResult.error) error = routesResult.error.message;
@@ -36,6 +39,7 @@
 			if (busesResult.error) error ??= busesResult.error.message;
 			else buses = (busesResult.data ?? []) as BusRow[];
 
+			routeLines = lines;
 			loading = false;
 		})();
 
@@ -170,7 +174,7 @@
 						<ArrowUpRight class="h-3 w-3" />
 					</a>
 				</header>
-				<Map buses={busTracker.list} mapStyle={MAP_STYLE} />
+				<Map buses={busTracker.list} mapStyle={MAP_STYLE} {routeLines} />
 			</section>
 
 			<div class="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-2">

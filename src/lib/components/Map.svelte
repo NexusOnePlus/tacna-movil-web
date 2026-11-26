@@ -8,10 +8,12 @@
 		Marker,
 		NavigationControl,
 		ScaleControl,
-		setWorkerUrl
+		setWorkerUrl,
+		type GeoJSONSource
 	} from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import { SvelteMap } from 'svelte/reactivity';
+	import type { RouteLines } from '#lib/route-lines';
 	import { MAP_STYLE } from '#lib/supabase';
 	import type { BusPosition } from '#lib/types';
 
@@ -21,6 +23,7 @@
 		zoom?: number;
 		selectedBusId?: string | null;
 		mapStyle?: string;
+		routeLines?: RouteLines | null;
 	}
 
 	let {
@@ -28,11 +31,13 @@
 		center = [-70.2505, -18.0146],
 		zoom = 13,
 		selectedBusId = null,
-		mapStyle = MAP_STYLE
+		mapStyle = MAP_STYLE,
+		routeLines = null
 	}: Props = $props();
 
 	let container: HTMLDivElement;
 	let map = $state<MapLibreMap | null>(null);
+	let mapReady = $state(false);
 	let mapError = $state<string | null>(null);
 	let followedId: string | null = null;
 
@@ -69,6 +74,7 @@
 		);
 
 		instance.on('load', () => {
+			mapReady = true;
 			mapError = null;
 		});
 		instance.on('error', (event) => {
@@ -92,7 +98,43 @@
 			markers.clear();
 			instance.remove();
 			map = null;
+			mapReady = false;
 		};
+	});
+
+	// Dibuja las líneas de ruta cuando llega la geometría.
+	$effect(() => {
+		const instance = map;
+		const ready = mapReady;
+		const data = routeLines;
+		if (!instance || !ready || !data) return;
+
+		const sourceId = 'route-lines';
+		const source = instance.getSource(sourceId) as GeoJSONSource | undefined;
+		if (source) {
+			source.setData(data);
+			return;
+		}
+
+		instance.addSource(sourceId, { type: 'geojson', data });
+		instance.addLayer({
+			id: 'route-lines-casing',
+			type: 'line',
+			source: sourceId,
+			layout: { 'line-cap': 'round', 'line-join': 'round' },
+			paint: { 'line-color': '#0e0e10', 'line-width': 7, 'line-opacity': 0.9 }
+		});
+		instance.addLayer({
+			id: 'route-lines',
+			type: 'line',
+			source: sourceId,
+			layout: { 'line-cap': 'round', 'line-join': 'round' },
+			paint: {
+				'line-color': ['get', 'color'],
+				'line-width': 3,
+				'line-opacity': 0.95
+			}
+		});
 	});
 
 	// Sincroniza marcadores con la lista de buses en vivo.

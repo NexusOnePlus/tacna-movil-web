@@ -19,6 +19,7 @@
 	// Rutas del panel a las que se puede volver tras el login.
 	const PANEL_ROUTES = [
 		'/dashboard',
+		'/dashboard/map',
 		'/dashboard/buses',
 		'/dashboard/routes',
 		'/dashboard/settings'

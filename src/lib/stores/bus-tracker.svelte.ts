@@ -24,6 +24,9 @@ class BusTracker {
 	status = $state<TrackerStatus>('idle');
 	lastEventAt = $state<number | null>(null);
 	lastError = $state<string | null>(null);
+	pingCount = $state(0);
+	avgPingMs = $state<number | null>(null);
+	pingsByHour = $state<number[]>(Array(6).fill(0));
 
 	list = $derived(
 		Object.values(this.positions).sort((a, b) => a.plate.localeCompare(b.plate, 'es'))
@@ -32,6 +35,7 @@ class BusTracker {
 
 	private channel: RealtimeChannel | null = null;
 	private pruneTimer: ReturnType<typeof setInterval> | null = null;
+	private pingTimes: number[] = [];
 
 	connect(): void {
 		if (this.channel) return;
@@ -74,6 +78,10 @@ class BusTracker {
 		this.positions = {};
 		this.status = 'idle';
 		this.lastEventAt = null;
+		this.pingTimes = [];
+		this.pingCount = 0;
+		this.avgPingMs = null;
+		this.pingsByHour = Array(6).fill(0);
 	}
 
 	/** Valida y aplica un payload recibido (o emitido localmente). */
@@ -93,7 +101,30 @@ class BusTracker {
 			speed: typeof payload.speed === 'number' ? payload.speed : 0,
 			updated_at: payload.updated_at ?? new Date().toISOString()
 		};
-		this.lastEventAt = Date.now();
+		const now = Date.now();
+		this.lastEventAt = now;
+		this.recordPing(now);
+	}
+
+	private recordPing(at: number): void {
+		this.pingTimes.push(at);
+		if (this.pingTimes.length > 240) this.pingTimes.shift();
+		this.pingCount = this.pingTimes.length;
+
+		if (this.pingTimes.length > 1) {
+			let total = 0;
+			for (let i = 1; i < this.pingTimes.length; i++) {
+				total += this.pingTimes[i] - this.pingTimes[i - 1];
+			}
+			this.avgPingMs = total / (this.pingTimes.length - 1);
+		}
+
+		const buckets = Array(6).fill(0);
+		for (const time of this.pingTimes) {
+			const index = 5 - Math.floor((at - time) / 3_600_000);
+			if (index >= 0 && index < 6) buckets[index] += 1;
+		}
+		this.pingsByHour = buckets;
 	}
 
 	/** Emite una posición al canal. Si el socket no está unido, supabase-js cae a REST. */

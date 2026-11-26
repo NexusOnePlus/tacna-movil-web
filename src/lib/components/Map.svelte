@@ -42,11 +42,9 @@
 
 	function markerClass(selected: boolean): string {
 		return [
-			'flex items-center justify-center w-9 h-9 rounded-full text-sm font-black',
-			'shadow-lg ring-2 transition-transform duration-200 will-change-transform',
-			selected
-				? 'bg-amber-400 text-black ring-white scale-125'
-				: 'bg-neutral-900/90 text-amber-400 ring-amber-500/70'
+			'flex items-center justify-center w-8 h-8 rounded-md text-sm',
+			'ring-2 transition-transform duration-200 will-change-transform',
+			selected ? 'bg-ok text-page ring-white scale-125' : 'bg-panel/95 text-live ring-live/60'
 		].join(' ');
 	}
 
@@ -164,9 +162,45 @@
 
 	{#if mapError}
 		<p
-			class="pointer-events-none absolute inset-x-3 top-3 rounded-lg border border-red-500/40 bg-neutral-950/95 px-3 py-2 text-[11px] text-red-300"
+			class="pointer-events-none absolute inset-x-3 top-3 rounded-md border border-warn/40 bg-page/95 px-3 py-2 text-[11px] text-warn"
 		>
 			Mapa: {mapError}
 		</p>
 	{/if}
 </div>
+
+<style>
+	:global(.maplibregl-ctrl-group) {
+		background: #151517;
+		border: 1px solid #ffffff14;
+	}
+
+	:global(.maplibregl-ctrl-group button + button) {
+		border-top-color: #ffffff14;
+	}
+
+	:global(.maplibregl-ctrl-group button .maplibregl-ctrl-icon) {
+		filter: invert(0.85);
+	}
+
+	:global(.maplibregl-ctrl-scale) {
+		background: #151517cc !important;
+		border-color: #ffffff14 !important;
+		color: #8c8c96 !important;
+	}
+
+	:global(.maplibregl-ctrl-attrib),
+	:global(.maplibregl-ctrl-attrib.maplibregl-compact),
+	:global(.maplibregl-ctrl-attrib.maplibregl-compact-show) {
+		background: #151517cc !important;
+		color: #8c8c96 !important;
+	}
+
+	:global(.maplibregl-ctrl-attrib a) {
+		color: #8c8c96 !important;
+	}
+
+	:global(.maplibregl-ctrl-attrib-button) {
+		filter: invert(0.85);
+	}
+</style>

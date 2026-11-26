@@ -27,35 +27,33 @@
 </script>
 
 {#if buses.length === 0}
-	<p class="px-4 py-8 text-center text-sm text-neutral-500">{emptyMessage}</p>
+	<p class="px-4 py-8 text-center text-[11px] text-muted">{emptyMessage}</p>
 {:else}
-	<ul class="divide-y divide-neutral-800">
+	<ul class="divide-y divide-hairline">
 		{#each buses as bus (bus.bus_id)}
 			{@const selected = bus.bus_id === selectedId}
 			<li>
 				<button
 					type="button"
 					onclick={() => onSelect?.(bus.bus_id)}
-					class="flex w-full items-center gap-3 px-4 py-3 text-left transition {selected
-						? 'bg-amber-500/10'
-						: 'hover:bg-neutral-800/60'}"
+					class="flex w-full items-center gap-3 px-3 py-2.5 text-left transition {selected
+						? 'bg-white/[0.05]'
+						: 'hover:bg-white/[0.03]'}"
 				>
 					<span
-						class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base {selected
-							? 'bg-amber-400 text-black'
-							: 'bg-neutral-800 text-amber-400'}"
+						class="grid h-8 w-8 shrink-0 place-items-center rounded-md {selected
+							? 'bg-live text-white'
+							: 'bg-raised text-live'}"
 					>
-						<BusIcon size={16} strokeWidth={2.4} />
+						<BusIcon size={15} strokeWidth={2.4} />
 					</span>
 
 					<span class="min-w-0 flex-1">
 						<span class="flex items-baseline justify-between gap-2">
-							<span class="truncate text-sm font-semibold text-white">{bus.plate}</span>
-							<span class="shrink-0 text-[11px] text-neutral-500"
-								>{formatAgo(bus.updated_at, now)}</span
-							>
+							<span class="truncate text-[13px] font-medium text-ink">{bus.plate}</span>
+							<span class="shrink-0 text-[10px] text-muted">{formatAgo(bus.updated_at, now)}</span>
 						</span>
-						<span class="mt-0.5 flex items-center gap-2 text-[11px] text-neutral-400">
+						<span class="mt-0.5 flex items-center gap-2 text-[10px] text-muted">
 							<span class="truncate">{bus.route_id || 'Sin ruta'}</span>
 							<span aria-hidden="true">·</span>
 							<span class="shrink-0 tabular-nums">{formatSpeed(bus.speed)}</span>

@@ -43,6 +43,7 @@ export interface Bus {
 export interface BusPosition {
 	bus_id: string;
 	route_id: string;
+	route_number?: string;
 	plate: string;
 	lat: number;
 	lng: number;

@@ -19,10 +19,17 @@
 	let simTimer: ReturnType<typeof setInterval> | null = null;
 
 	const visibleBuses = $derived(
-		routeFilter ? busTracker.list.filter((bus) => bus.route_id === routeFilter) : busTracker.list
+		routeFilter ? busTracker.list.filter((bus) => matchesRoute(bus, routeFilter)) : busTracker.list
 	);
 
 	const filteredRoute = $derived(routes.find((route) => route.id === routeFilter) ?? null);
+
+	function matchesRoute(bus: BusPosition, routeId: string | null): boolean {
+		if (bus.route_number) {
+			return routes.find((route) => route.id === routeId)?.short_code === bus.route_number;
+		}
+		return bus.route_id === routeId;
+	}
 
 	onMount(() => {
 		void (async () => {
@@ -91,7 +98,7 @@
 		routeFilter = routeId;
 		if (routeId === null) return;
 		const stillVisible = busTracker.list.some(
-			(bus) => bus.bus_id === selectedBusId && bus.route_id === routeId
+			(bus) => bus.bus_id === selectedBusId && matchesRoute(bus, routeId)
 		);
 		if (!stillVisible) selectedBusId = null;
 	}

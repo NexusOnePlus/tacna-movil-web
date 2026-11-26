@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tacna Móvil Rastreo</string>
+    <string name="ruta">Ruta</string>
+    <string name="placa_o_nombre">Placa o Nombre</string>
+    <string name="preparar">Preparar ubicación</string>
+    <string name="habilitar">Activa la ubicación del dispositivo para continuar.</string>
+    <string name="ajustes">Abrir ajustes</string>
+    <string name="permiso">Permite el acceso a la ubicación precisa para continuar.</string>
+    <string name="listo">Completa la ruta y la placa o nombre para iniciar el envío.</string>
+    <string name="iniciar">Iniciar envío</string>
+    <string name="guardar">Guardar datos</string>
+    <string name="guardado">Datos guardados.</string>
+    <string name="detener">Detener envío</string>
+    <string name="transmitiendo">Envío de ubicación activo</string>
+    <string name="ruta_invalida">La ruta debe tener entre uno y seis dígitos.</string>
+    <string name="placa_invalida">Ingresa una placa o nombre de hasta 64 caracteres.</string>
+</resources>

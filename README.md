@@ -121,6 +121,12 @@ entra directo a `/login` o usa `/dashboard?panel`.
   evento `bus-location`. No usa `postgres_changes`, así que no hace falta añadir
   tablas a la publicación `supabase_realtime`. Un bus sin señal desaparece del
   mapa a los 60 s.
+- **Rastreo Android**: [proyecto del APK](android-tracker/README.md). Los teléfonos
+  envían `POST /api/rastreo` por HTTPS con un JSON de hasta 1 KiB, por ejemplo
+  `{"ruta":"12","placa_o_nombre":"ABC-123","lat":-18.0146,"lng":-70.2505}`.
+  El endpoint limpia las coordenadas y publica por Realtime. El panel conserva
+  en memoria la última posición de cada combinación de ruta y placa o nombre.
+  El endpoint admite reportes sin autenticación del dispositivo.
 - **Flota y rutas**: consultas normales a Supabase protegidas por RLS.
 - **Sesión**: `supabase.auth` en el cliente (localStorage); el panel se renderiza
   solo en el navegador porque MapLibre y Realtime son APIs de navegador.

@@ -35,8 +35,14 @@
 	let map = $state<MapLibreMap | null>(null);
 	let mapError = $state<string | null>(null);
 	let followedId: string | null = null;
+	let followedPosition: BusPosition | null = null;
 
-	type MarkerView = { marker: Marker; icon: ReturnType<typeof mount> };
+	type MarkerView = {
+		marker: Marker;
+		icon?: ReturnType<typeof mount>;
+		position?: BusPosition;
+		selected?: boolean;
+	};
 
 	const markers = new SvelteMap<string, MarkerView>();
 
@@ -86,7 +92,7 @@
 		return () => {
 			observer.disconnect();
 			for (const view of markers.values()) {
-				unmount(view.icon);
+				if (view.icon) void unmount(view.icon);
 				view.marker.remove();
 			}
 			markers.clear();
@@ -104,7 +110,7 @@
 
 		for (const [busId, view] of markers) {
 			if (!activeIds.has(busId)) {
-				unmount(view.icon);
+				if (view.icon) void unmount(view.icon);
 				view.marker.remove();
 				markers.delete(busId);
 			}
@@ -119,16 +125,31 @@
 				const marker = new Marker({ element, anchor: 'center' })
 					.setLngLat([bus.lng, bus.lat])
 					.addTo(instance);
-				const icon = mount(BusIcon, { target: element, props: { size: 18, strokeWidth: 2.5 } });
-				view = { marker, icon };
+				view = { marker };
+				if (bus.route_number) {
+					element.classList.add('route-square');
+					element.textContent = bus.route_number;
+					element.style.setProperty('--route-digits', String(bus.route_number.length));
+				} else {
+					view.icon = mount(BusIcon, { target: element, props: { size: 18, strokeWidth: 2.5 } });
+				}
 				markers.set(bus.bus_id, view);
 			}
 
 			const element = view.marker.getElement();
-			element.className = markerClass(selected);
-			element.title = `${bus.plate} · ${Math.round(bus.speed)} km/h`;
-
-			view.marker.setLngLat([bus.lng, bus.lat]);
+			if (view.icon && view.selected !== selected) {
+				element.classList.remove(...markerClass(!selected).split(' '));
+				element.classList.add(...markerClass(selected).split(' '));
+				view.selected = selected;
+			}
+			if (view.position === bus) continue;
+			element.title = bus.route_number
+				? `Ruta ${bus.route_number} · ${bus.plate}`
+				: `${bus.plate} · ${Math.round(bus.speed)} km/h`;
+			if (view.position && (view.position.lng !== bus.lng || view.position.lat !== bus.lat)) {
+				view.marker.setLngLat([bus.lng, bus.lat]);
+			}
+			view.position = bus;
 		}
 	});
 
@@ -138,11 +159,13 @@
 		const busId = selectedBusId;
 		if (!instance || !busId) {
 			followedId = null;
+			followedPosition = null;
 			return;
 		}
 
 		const bus = buses.find((candidate) => candidate.bus_id === busId);
-		if (!bus) return;
+		if (!bus || followedPosition === bus) return;
+		followedPosition = bus;
 
 		if (followedId === busId) {
 			instance.jumpTo({ center: [bus.lng, bus.lat] });
@@ -157,7 +180,7 @@
 	});
 </script>
 
-<div class="relative flex min-h-[320px] w-full flex-1 flex-col">
+<div class="map-frame relative flex min-h-[320px] w-full flex-1 flex-col">
 	<div bind:this={container} class="min-h-0 w-full flex-1"></div>
 
 	{#if mapError}
@@ -170,6 +193,22 @@
 </div>
 
 <style>
+	.map-frame {
+		container-type: inline-size;
+	}
+
+	.map-frame :global(.route-square) {
+		display: grid;
+		place-items: center;
+		width: 1cqw;
+		height: 1cqw;
+		background: white;
+		color: black;
+		font-size: min(0.85cqw, calc(1.48cqw / var(--route-digits)));
+		font-weight: 700;
+		line-height: 1;
+	}
+
 	:global(.maplibregl-ctrl-group) {
 		background: #151517;
 		border: 1px solid #ffffff14;
